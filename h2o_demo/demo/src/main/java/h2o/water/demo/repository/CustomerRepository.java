@@ -3,11 +3,13 @@ package h2o.water.demo.repository;
 import h2o.water.demo.model.Customer;
 import h2o.water.demo.model.CustomerMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Repository
@@ -58,7 +60,13 @@ public class CustomerRepository implements ICustomerRepository {
     @Override
     public Customer getCustomerById(Integer id) {
         String query = String.format("Select * from %s where id=?", CUSTOMER_TABLE_NAME);
-        return jdbcTemplate.queryForObject(query, new CustomerMapper(), id);
+        try
+        {
+            return jdbcTemplate.queryForObject(query, new CustomerMapper(), id);
+        }
+        catch (EmptyResultDataAccessException e) {
+            return null;
+        }
 
         // inline mapper
         /*
